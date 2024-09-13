@@ -1,5 +1,6 @@
 import { CheckLists } from "@/components/CheckLists";
 import CreateListModal from "@/components/CreateListModal";
+import { PageContent, PageHeader, PageLayout } from "@/components/layouts/PageLayout";
 import {
   Card,
   CardDescription,
@@ -10,7 +11,6 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { currentUser } from "@clerk/nextjs/server";
 import { Suspense } from "react";
-
 
 async function Welcome() {
   const user = await currentUser();
@@ -40,13 +40,17 @@ function WelcomeFallback() {
 
 export default function HomePage() {
   return (
-    <main className="flex w-full flex-col items-center px-4">
-      <Suspense fallback={<WelcomeFallback />}>
-        <Welcome />
-      </Suspense>
-      <Suspense fallback={<WelcomeFallback />}>
-        <CheckLists  />
-      </Suspense>
-    </main>
+    <PageLayout>
+      <PageHeader>
+        <Suspense fallback={<WelcomeFallback />}>
+          <Welcome />
+        </Suspense>
+      </PageHeader>
+      <PageContent>
+        <Suspense fallback={<WelcomeFallback />}>
+          <CheckLists />
+        </Suspense>
+      </PageContent>
+    </PageLayout>
   );
 }

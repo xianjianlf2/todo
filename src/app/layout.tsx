@@ -1,4 +1,5 @@
 import Header from "@/components/Header";
+import Sidebar from "@/components/Sidebar";
 import ThemeProvider from "@/components/ThemeProvider";
 import { Toaster } from "@/components/ui/toaster";
 import zhCNlocales from "@/locales/zh.json";
@@ -20,8 +21,8 @@ export default function RootLayout({
   const localization = merge(zhCN, zhCNlocales);
   return (
     <ClerkProvider localization={localization}>
-      <html lang="zh-CN" suppressHydrationWarning>
-        <body>
+      <html lang="zh-CN" suppressHydrationWarning className="h-full">
+        <body className="flex h-full flex-col">
           <ThemeProvider
             attribute="class"
             defaultTheme="system"
@@ -29,7 +30,10 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <Header />
-            <div className="flex w-full flex-col items-center">{children}</div>
+            <div className="flex flex-1 overflow-hidden">
+              <Sidebar />
+              <main className="flex-1 overflow-hidden">{children}</main>
+            </div>
             <Toaster />
           </ThemeProvider>
         </body>

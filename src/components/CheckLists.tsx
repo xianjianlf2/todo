@@ -12,10 +12,12 @@ import {
   CardHeader,
   CardTitle,
 } from "./ui/card";
+import { ScrollArea } from "./ui/scroll-area";
 
 interface CheckListProps {
-  checkList: List;
+  checkList: List & { tasks: Task[] };
 }
+
 function CheckList({ checkList }: CheckListProps) {
   const { name, color, tasks } = checkList;
   return (
@@ -61,11 +63,13 @@ export async function CheckLists() {
 
   return (
     <>
-      <div className="mt-6 flex w-full flex-col gap-4">
+      <ScrollArea className="h-full w-full">
+        <div className="mt-6 flex w-full flex-col gap-4">
         {checkLists.map((checkList) => (
           <CheckList key={checkList.id} checkList={checkList} />
-        ))}
-      </div>
+          ))}
+        </div>
+      </ScrollArea>
     </>
   );
 }
