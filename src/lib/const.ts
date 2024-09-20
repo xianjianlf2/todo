@@ -8,3 +8,12 @@ export const ListMap = new Map([
     ["pink", ["bg-pink-500", "粉粉"]],
     ["black", ["bg-black", "黑色"]],
 ]);
+
+export const MODEL_OPTIONS = [
+    { value: "gpt-3.5-turbo", label: "GPT-3.5 Turbo" },
+    { value: "gpt-4", label: "GPT-4" },
+    { value: "claude-3-sonnet-20240229", label: "Claude 3 Sonnet" },
+];
+
+export const DEFAULT_SIDEBAR_WIDTH = 400;
+export const MIN_SIDEBAR_WIDTH = 300;

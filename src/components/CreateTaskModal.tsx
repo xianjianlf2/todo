@@ -5,8 +5,8 @@ import { toast } from "@/hooks/use-toast";
 import { ListMap } from "@/lib/const";
 import { cn } from "@/lib/utils";
 import {
-    createTaskZodSchema,
-    createTaskZodSchemaType,
+  createTaskZodSchema,
+  createTaskZodSchemaType,
 } from "@/schema/createTask";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { List } from "@prisma/client";
@@ -17,21 +17,21 @@ import { useForm } from "react-hook-form";
 import { Button } from "./ui/button";
 import { Calendar } from "./ui/calendar";
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
 } from "./ui/dialog";
 import {
-    Form,
-    FormControl,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
 } from "./ui/form";
 import { Input } from "./ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
@@ -110,7 +110,7 @@ export default function CreateTaskModal({ checkList }: Props) {
 
               <FormField
                 control={form.control}
-                name="expiredAt"
+                name="expiresAt"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>任务截止时间：</FormLabel>

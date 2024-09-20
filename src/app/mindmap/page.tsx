@@ -8,7 +8,7 @@ function MindMapFallback() {
 
 export default function MindMapPage() {
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 h-full w-full">
       <h1 className="text-2xl font-bold">MindMap</h1>
       <Suspense fallback={<MindMapFallback />}>
         <MindMap />

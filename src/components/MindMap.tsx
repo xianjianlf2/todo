@@ -1,70 +1,98 @@
 "use client";
 
+import ChatSidebar from "@/components/ChatSidebar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { generateId } from "@/lib/utils";
+import { useMindMapStore } from "@/store/mindMapStore";
 import {
-    Background,
-    BackgroundVariant,
-    Controls,
-    ReactFlow,
+  Background,
+  BackgroundVariant,
+  Controls,
+  ReactFlow,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, MessageSquare } from "lucide-react";
 import { useTheme } from "next-themes";
-import React, { useState } from "react";
-import { Input } from "./ui/input";
+import { useEffect, useState } from "react";
+import { DragDropContext } from "react-beautiful-dnd";
 
-const initialNodes = [
-  { id: "1", position: { x: 0, y: 0 }, data: { label: "1" } },
-  { id: "2", position: { x: 0, y: 100 }, data: { label: "2" } },
-];
-const initialEdges = [{ id: "e1-2", source: "1", target: "2" }];
-
-const MindMap: React.FC = () => {
+const MindMap = () => {
   const { theme } = useTheme();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [nodes, setNodes] = useState(initialNodes);
-  const [edges, setEdges] = useState(initialEdges);
+  const [colorMode, setColorMode] = useState<"light" | "dark">("light");
+
+  const {
+    nodes,
+    edges,
+    highlightedNode,
+    setNodes,
+    setEdges,
+    setHighlightedNode,
+    messages,
+  } = useMindMapStore();
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
-  return (
-    <Card className="flex h-screen">
-      <CardContent className="relative flex-grow p-0">
-        <ReactFlow
-          nodes={nodes}
-          edges={edges}
-         
-          colorMode={theme === "dark" ? "dark" : "light"}
-          zoomOnScroll={true}
-          zoomOnDoubleClick={false}
-        >
-          <Background color="#ccc" variant={BackgroundVariant.Dots} />
-          <Controls />
-        </ReactFlow>
-        <Button
-          variant="outline"
-          size="icon"
-          className="absolute right-2 top-2"
-          onClick={toggleSidebar}
-        >
-          {isSidebarOpen ? <ChevronRight /> : <ChevronLeft />}
-        </Button>
-      </CardContent>
+  useEffect(() => {
+    setColorMode(theme === "dark" ? "dark" : "light");
+  }, [theme]);
 
-      {isSidebarOpen && (
-        <div className="flex w-[300px] flex-col border-l p-4">
-          <h2 className="mb-4 text-lg font-semibold">Chat & Edit</h2>
-          <div className="mb-4 flex-grow overflow-y-auto">
-            {/* Chat messages */}
-          </div>
-          <Input placeholder="Type your message..." className="mb-4" />
-          <div className="space-y-4">
-            <h3 className="font-medium">Edit Node</h3>
-            {/* Add node editing controls here */}
-          </div>
-        </div>
-      )}
+  const onDragEnd = (result: any) => {
+    if (!result) return;
+    const message = messages.find(
+      (message) => message.id === result.draggableId,
+    );
+    if (message) {
+      const newNode = {
+        id: generateId(),
+        position: { x: Math.random() * 500, y: Math.random() * 500 },
+        data: { label: message.content },
+      };
+      setNodes([...nodes, newNode]);
+      setHighlightedNode(newNode.id);
+
+      setTimeout(() => setHighlightedNode(null), 2000);
+    }
+  };
+
+  return (
+    <Card className="flex h-[95%]">
+      <DragDropContext onDragEnd={onDragEnd}>
+        <CardContent className="relative flex-grow p-0">
+          <ReactFlow
+            nodes={nodes.map((node) => ({
+              ...node,
+              style:
+                node.id === highlightedNode
+                  ? { border: "2px solid #ff0" }
+                  : {},
+            }))}
+            edges={edges}
+            colorMode={colorMode}
+            zoomOnScroll={true}
+            zoomOnDoubleClick={false}
+            fitView
+          >
+            <Background color="#ccc" variant={BackgroundVariant.Dots} />
+            <Controls />
+          </ReactFlow>
+          <Button
+            variant="outline"
+            size="icon"
+            className="absolute right-2 top-2 flex h-auto flex-col items-center p-1"
+            onClick={toggleSidebar}
+          >
+            {isSidebarOpen ? (
+              <ChevronRight className="mb-1" />
+            ) : (
+              <ChevronLeft className="mb-1" />
+            )}
+            <MessageSquare />
+          </Button>
+        </CardContent>
+        {isSidebarOpen && <ChatSidebar isSidebarOpen={isSidebarOpen} />}
+      </DragDropContext>
     </Card>
   );
 };

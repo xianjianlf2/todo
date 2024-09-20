@@ -12,7 +12,7 @@ const Sidebar: React.FC = () => {
       <div className="space-y-4 py-4">
         <div className="px-3 py-2">
           <h2 className="mb-2 px-4 text-lg font-semibold tracking-tight">
-            导航
+            Navigation
           </h2>
           <div className="space-y-1">
             <Link href="/">
@@ -33,7 +33,7 @@ const Sidebar: React.FC = () => {
                   <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
                   <polyline points="9 22 9 12 15 12 15 22"></polyline>
                 </svg>
-                首页
+                Home
               </Button>
             </Link>
             <Link href="/mindmap">
@@ -51,10 +51,9 @@ const Sidebar: React.FC = () => {
                   strokeLinejoin="round"
                   className="mr-2 h-4 w-4"
                 >
-                  <circle cx="12" cy="12" r="10"></circle>
-                  <polygon points="10 8 16 12 10 16 10 8"></polygon>
+                  <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
                 </svg>
-                思维导图
+                MindMap
               </Button>
             </Link>
             <Link href="/todo">
@@ -74,7 +73,7 @@ const Sidebar: React.FC = () => {
                 >
                   <path d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2M3 3h18M12 12h.01M12 12h.01M12 12h.01M12 12h.01"></path>
                 </svg>
-                待办事项
+                Todo
               </Button>
             </Link>
           </div>
