@@ -1,5 +1,4 @@
-import { generateId } from "@/lib/utils";
-import { Edge, Node } from "@xyflow/react";
+import { Edge, Node, NodeChange, applyNodeChanges } from "@xyflow/react";
 import { create } from "zustand";
 
 export interface Message {
@@ -9,31 +8,25 @@ export interface Message {
 }
 
 type MindMapStore = {
-    nodes: Node[]
-    edges: Edge[]
-    messages: Message[]
-    isStreaming: boolean
-    highlightedNode: string | null
-    setNodes: (nodes: Node[]) => void
-    setEdges: (edges: Edge[]) => void
-    addMessage: (content: string, role: "user" | "assistant") => void
-    setHighlightedNode: (nodeId: string | null) => void
-    setIsStreaming: (isStreaming: boolean) => void
-}
-export const useMindMapStore = create<MindMapStore>((set) => ({
+    nodes: Node[];
+    edges: Edge[];
+    highlightedNodes: string[];
+    setNodes: (nodes: Node[]) => void;
+    setEdges: (edges: Edge[]) => void;
+    setHighlightedNodes: (nodeIds: string[]) => void;
+    onNodesChange: (changes: NodeChange<Node>[]) => void
+};
+export const useMindMapStore = create<MindMapStore>((set, get) => ({
     nodes: [],
     edges: [],
-    messages: [],
-    isStreaming: false,
-    highlightedNode: null,
+    highlightedNodes: [],
     setNodes: (nodes) => set({ nodes }),
     setEdges: (edges) => set({ edges }),
-    addMessage: (content, role) => set((state) => ({
-        messages: [...state.messages, { id: generateId(), content, role }]
-    })),
-    setHighlightedNode: (nodeId) => set({ highlightedNode: nodeId }),
-    setIsStreaming: (isStreaming) => set({ isStreaming }),
-}))
-
-
-
+    setHighlightedNodes: (nodeIds) => set({ highlightedNodes: nodeIds }),
+    onNodesChange: (updatedNodes) => {
+        const { nodes } = get();
+        const newNodes = applyNodeChanges(updatedNodes, nodes);
+        set({ nodes: newNodes });
+        return newNodes;
+    },
+}));

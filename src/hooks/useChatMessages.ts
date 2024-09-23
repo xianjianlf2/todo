@@ -1,21 +1,11 @@
 import { sendChatMessage } from "@/actions/chat";
 import { generateId } from "@/lib/utils";
-import { Message, useMindMapStore } from "@/store/mindMapStore";
-import { useCallback, useState } from 'react';
+import { useChatStore } from "@/store/chatStore";
+import { Message } from "@/store/mindMapStore";
+import { useCallback } from 'react';
 
 export const useChatMessages = () => {
-    const [messages, setMessages] = useState<Message[]>([
-        {
-            id: generateId(),
-            role: "assistant",
-            content: "Hello! How can I assist you today?",
-        },
-    ]);
-    const { isStreaming, setIsStreaming } = useMindMapStore();
-
-    const addMessage = useCallback((message: Message) => {
-        setMessages(prevMessages => [...prevMessages, message]);
-    }, []);
+    const { messages, isStreaming, addMessage, setIsStreaming, appendAssistantMessage } = useChatStore();
 
     const sendMessage = useCallback(async (content: string, modelType: string) => {
         if (isStreaming) return;
@@ -32,11 +22,7 @@ export const useChatMessages = () => {
                 modelType,
                 (chunk) => {
                     const data = JSON.parse(chunk);
-                    assistantMessage.content += data.content;
-                    setMessages(prevMessages => [
-                        ...prevMessages.slice(0, -1),
-                        { ...assistantMessage },
-                    ]);
+                    appendAssistantMessage(data.content);
                 },
             );
         } catch (error: unknown) {
@@ -49,7 +35,7 @@ export const useChatMessages = () => {
         } finally {
             setIsStreaming(false);
         }
-    }, [messages, addMessage, isStreaming]);
+    }, [messages, addMessage, isStreaming, appendAssistantMessage]);
 
-  return { messages, isStreaming, sendMessage };
+    return { messages, isStreaming, sendMessage };
 };

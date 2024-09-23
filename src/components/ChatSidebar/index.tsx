@@ -1,10 +1,12 @@
 "use client";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { useChatMessages } from "@/hooks/useChatMessages";
 import { useSidebarResize } from "@/hooks/useSidebarResize";
 import React, { useEffect, useRef } from "react";
 import { StrictModeDroppable } from "../StrictModeDroppable";
 import { ChatInput } from "./ChatInput";
 import { ChatMessage } from "./ChatMessage";
+import { useChatStore } from "@/store/chatStore";
 
 interface ChatSidebarProps {
   isSidebarOpen: boolean;
@@ -13,7 +15,8 @@ interface ChatSidebarProps {
 const ChatSidebar: React.FC<ChatSidebarProps> = ({ isSidebarOpen }) => {
   if (!isSidebarOpen) return null;
 
-  const { messages, isStreaming, sendMessage } = useChatMessages();
+  const { messages, isStreaming, addMessage, removeMessage, updateMessage, setIsStreaming } = useChatStore();
+  const { sendMessage } = useChatMessages();
   const { sidebarWidth, handleMouseDown } = useSidebarResize();
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -31,7 +34,7 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({ isSidebarOpen }) => {
         onMouseDown={handleMouseDown}
       />
       <h2 className="mb-4 text-lg font-semibold">Chat & Edit</h2>
-      <div className="mb-4 flex-grow space-y-4 overflow-y-auto">
+      <ScrollArea className="mb-4 flex-grow space-y-4">
         <StrictModeDroppable droppableId="droppable">
           {(provided) => (
             <div
@@ -47,7 +50,7 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({ isSidebarOpen }) => {
           )}
         </StrictModeDroppable>
         <div ref={messagesEndRef} />
-      </div>
+      </ScrollArea>
       <ChatInput onSendMessage={sendMessage} isStreaming={isStreaming} />
     </div>
   );

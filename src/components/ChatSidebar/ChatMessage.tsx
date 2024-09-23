@@ -1,8 +1,12 @@
+"use client";
 import { toast } from "@/hooks/use-toast";
 import { Message } from "@/store/mindMapStore";
 import { Copy } from "lucide-react";
 import React from "react";
 import { Draggable } from "react-beautiful-dnd";
+import Markdown from "react-markdown";
+import remarkGfm from 'remark-gfm';
+
 
 interface ChatMessageProps {
   message: Message;
@@ -45,7 +49,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message, index }) => {
               />
             </div>
             <hr className="mb-2 border-t border-gray-300 dark:border-gray-600" />
-            <div className="text-sm">{message.content}</div>
+            <Markdown remarkPlugins={[remarkGfm]}>{message.content}</Markdown>
           </div>
         </div>
       )}
