@@ -1,3 +1,4 @@
+'use client'
 import { Message } from "@/store/mindMapStore";
 
 
@@ -6,6 +7,7 @@ export const sendChatMessage = async (
     modelType: string,
     onChunk: (chunk: string) => void
 ) => {
+    
     const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },

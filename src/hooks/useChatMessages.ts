@@ -3,6 +3,7 @@ import { generateId } from "@/lib/utils";
 import { useChatStore } from "@/store/chatStore";
 import { Message } from "@/store/mindMapStore";
 import { useCallback } from 'react';
+import { toast } from "./use-toast";
 
 export const useChatMessages = () => {
     const { messages, isStreaming, addMessage, setIsStreaming, appendAssistantMessage } = useChatStore();
@@ -27,10 +28,10 @@ export const useChatMessages = () => {
             );
         } catch (error: unknown) {
             const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
-            addMessage({
-                id: generateId(),
-                role: "assistant",
-                content: `Error: ${errorMessage}`,
+            toast({
+                title: "Error",
+                description: errorMessage,
+                variant: "destructive",
             });
         } finally {
             setIsStreaming(false);

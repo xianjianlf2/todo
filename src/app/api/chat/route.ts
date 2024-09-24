@@ -14,13 +14,20 @@ function processHistoryMessages(messages: any[]): BaseMessageLike[] {
 }
 export async function POST(request: Request) {
   const { messages, modelType } = await request.json();
+  const apiKey = request.headers.get('Authorization')?.split('Bearer ')[1];
 
   if (!messages || !modelType) {
     return NextResponse.json({ message: 'Missing messages or modelType' }, { status: 400 });
   }
 
+  const key = apiKey || process.env.OPENAI_API_KEY;
+  if (!key) {
+    return NextResponse.json({ message: 'API key is required but not provided' }, { status: 401 });
+  }
+
   try {
     const model = models[modelType as ModelType];
+    model.apiKey = key;
     const processedMessages = processHistoryMessages(messages);
     const stream = await model.stream(processedMessages);
     const encoder = new TextEncoder();

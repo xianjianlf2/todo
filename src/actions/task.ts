@@ -1,19 +1,15 @@
 "use server";
 
+import { requireAuth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import {
     createTaskZodSchema,
     createTaskZodSchemaType,
 } from "@/schema/createTask";
-import { currentUser } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 
 export async function createTask(data: createTaskZodSchemaType) {
-    const user = await currentUser();
-
-    if (!user) {
-        throw new Error("用户未登录，请先登录");
-    }
+    const user = await requireAuth();
 
     const result = createTaskZodSchema.safeParse(data);
 

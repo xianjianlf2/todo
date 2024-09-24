@@ -3,16 +3,14 @@
 import ChatSidebar from "@/components/ChatSidebar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { parseMarkdownToFlowData } from "@/lib/flowUtils";
 import { useChatStore } from "@/store/chatStore";
 import { useMindMapStore } from "@/store/mindMapStore";
 import {
   Background,
   BackgroundVariant,
   Controls,
-  Edge,
-  Node,
-  ReactFlow,
-  XYPosition,
+  ReactFlow
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { ChevronLeft, ChevronRight, MessageSquare } from "lucide-react";
@@ -20,73 +18,7 @@ import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { DragDropContext } from "react-beautiful-dnd";
 
-interface MarkdownNode {
-  id: string;
-  type: string;
-  data: {
-    label: string;
-  };
-  position: XYPosition;
-  depth: number;
-}
 
-function markdownToNodesAndEdges(markdown: string): {
-  nodes: Node[];
-  edges: Edge[];
-} {
-  const lines = markdown.split("\n");
-  const nodes: MarkdownNode[] = [];
-  const edges: Edge[] = [];
-  let currentDepth = 0;
-  let lastNodeId = "";
-
-  lines.forEach((line, index) => {
-    if (line.startsWith("#")) {
-      const depth = line.match(/^#+/)![0].length;
-      const id = `node-${index}`;
-      const label = line.substring(depth).trim();
-      const position: XYPosition = { x: index * 200, y: 100 * depth };
-
-      nodes.push({
-        id,
-        data: { label },
-        position,
-        depth,
-        type: "default",
-      });
-
-      if (lastNodeId && depth > currentDepth) {
-        edges.push({
-          id: `edge-${index}`,
-          type: "straight",
-          source: lastNodeId,
-          target: id,
-        });
-      } else if (lastNodeId && depth < currentDepth) {
-        let parentId = "";
-        for (let i = nodes.length - 1; i >= 0; i--) {
-          if (nodes[i] && nodes[i]!.depth === depth - 1) {
-            parentId = nodes[i]!.id;
-            break;
-          }
-        }
-        if (parentId) {
-          edges.push({
-            id: `edge-${index}`,
-            type: "straight",
-            source: parentId,
-            target: id,
-          });
-        }
-      }
-
-      currentDepth = depth;
-      lastNodeId = id;
-    }
-  });
-
-  return { nodes, edges };
-}
 
 const MindMap = () => {
   const { theme } = useTheme();
@@ -117,7 +49,7 @@ const MindMap = () => {
     );
     if (!message) return;
 
-    const { nodes: newNodes, edges: newEdges } = markdownToNodesAndEdges(
+    const { nodes: newNodes, edges: newEdges } = parseMarkdownToFlowData(
       message.content,
     );
     setNodes(newNodes);
