@@ -3,16 +3,38 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SignInButton, SignUpButton } from "@clerk/nextjs";
+import { Moon, Sun } from "lucide-react";
+import { useTheme } from "next-themes";
 
+import Footer from "@/components/Footer";
 import Image from "next/image";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 export default function LandingPage() {
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   return (
     <div className="container mx-auto p-4">
       <header className="flex items-center justify-between py-6">
         <h1 className="text-2xl font-bold">MindGenius AI</h1>
-        <nav>
+        <nav className="flex items-center">
+          {mounted && (
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label="Toggle theme"
+              className="mr-2"
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            >
+              {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+            </Button>
+          )}
           <Button asChild variant="ghost" className="mr-2">
             <SignInButton mode="modal">
               <span>Login</span>
@@ -84,9 +106,7 @@ export default function LandingPage() {
         </section>
       </main>
 
-      <footer className="mt-16 py-8 text-center text-muted-foreground">
-        <p>&copy; 2023 MindMapper. All rights reserved.</p>
-      </footer>
+     
     </div>
   );
 }

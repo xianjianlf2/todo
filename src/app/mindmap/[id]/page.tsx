@@ -1,20 +1,20 @@
 "use client";
 
-import type { MindMap } from "@/types/mindmap";
 import MindMapComponent from "@/components/MindMap";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import {
-    deleteMindMap,
-    getMindMapById,
-    isDBReady,
-    saveMindMap,
+  deleteMindMap,
+  getMindMapById,
+  isDBReady,
+  saveMindMap,
 } from "@/lib/indexedDB";
 import { generateId } from "@/lib/utils";
 import { useChatStore } from "@/store/chatStore";
 import { useMindMapStore } from "@/store/mindMapStore";
+import type { MindMap } from "@/types/mindmap";
 import { ArrowLeft, Check, Pencil, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -162,7 +162,7 @@ export default function MindMapPage({ params }: { params: { id: string } }) {
   };
 
   const handleGoBack = () => {
-    router.back();
+    router.push("/mindmap");
   };
 
   if (!mindMap) return <Skeleton className="h-full w-full" />;
