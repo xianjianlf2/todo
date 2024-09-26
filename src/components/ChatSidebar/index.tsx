@@ -1,21 +1,21 @@
 "use client";
+import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useChatMessages } from "@/hooks/useChatMessages";
 import { useSidebarResize } from "@/hooks/useSidebarResize";
+import { useChatStore } from "@/store/chatStore";
+import { Trash2 } from "lucide-react";
 import React, { useEffect, useRef } from "react";
 import { StrictModeDroppable } from "../StrictModeDroppable";
 import { ChatInput } from "./ChatInput";
 import { ChatMessage } from "./ChatMessage";
-import { useChatStore } from "@/store/chatStore";
 
 interface ChatSidebarProps {
   isSidebarOpen: boolean;
 }
 
 const ChatSidebar: React.FC<ChatSidebarProps> = ({ isSidebarOpen }) => {
-  if (!isSidebarOpen) return null;
-
-  const { messages, isStreaming, addMessage, removeMessage, updateMessage, setIsStreaming } = useChatStore();
+  const { messages, isStreaming, clearMessages } = useChatStore();
   const { sendMessage } = useChatMessages();
   const { sidebarWidth, handleMouseDown } = useSidebarResize();
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -23,6 +23,8 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({ isSidebarOpen }) => {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  if (!isSidebarOpen) return null;
 
   return (
     <div
@@ -33,7 +35,17 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({ isSidebarOpen }) => {
         className="absolute bottom-0 left-0 top-0 w-1 cursor-ew-resize bg-gray-300 transition-colors hover:bg-gray-400"
         onMouseDown={handleMouseDown}
       />
-      <h2 className="mb-4 text-lg font-semibold">Chat & Edit</h2>
+      <div className="mb-4 flex items-center justify-between">
+        <h2 className="text-lg font-semibold">Chat & Edit</h2>
+        <Button
+          onClick={clearMessages}
+          variant="ghost"
+          size="icon"
+          title="clear chat"
+        >
+          <Trash2 className="h-5 w-5" />
+        </Button>
+      </div>
       <ScrollArea className="mb-4 flex-grow space-y-4">
         <StrictModeDroppable droppableId="droppable">
           {(provided) => (

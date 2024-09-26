@@ -5,24 +5,19 @@
   "type": "module",
   "scripts": {
     "build": "next build",
-    "db:generate": "prisma migrate dev",
-    "db:migrate": "prisma migrate deploy",
-    "db:push": "prisma db push",
-    "db:studio": "prisma studio",
     "dev": "next dev",
-    "postinstall": "prisma generate",
     "lint": "next lint",
     "start": "next start"
   },
   "dependencies": {
     "@clerk/localizations": "^2.8.1",
     "@clerk/nextjs": "^5.4.1",
+    "@clerk/themes": "^2.1.32",
     "@dagrejs/dagre": "^1.1.4",
     "@hookform/resolvers": "^3.9.0",
     "@langchain/anthropic": "^0.3.1",
     "@langchain/core": "^0.3.2",
     "@langchain/openai": "^0.3.0",
-    "@prisma/client": "^5.14.0",
     "@radix-ui/react-accordion": "^1.2.0",
     "@radix-ui/react-alert-dialog": "^1.1.1",
     "@radix-ui/react-aspect-ratio": "^1.1.0",
@@ -98,7 +93,6 @@
     "postcss": "^8.4.39",
     "prettier": "^3.3.2",
     "prettier-plugin-tailwindcss": "^0.6.5",
-    "prisma": "^5.14.0",
     "tailwindcss": "^3.4.3",
     "typescript": "^5.5.3"
   },

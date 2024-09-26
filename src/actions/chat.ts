@@ -1,5 +1,5 @@
 'use client'
-import { Message } from "@/store/mindMapStore";
+import type { Message } from "@/store/mindMapStore";
 
 
 export const sendChatMessage = async (
@@ -7,7 +7,7 @@ export const sendChatMessage = async (
     modelType: string,
     onChunk: (chunk: string) => void
 ) => {
-    
+
     const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -15,8 +15,8 @@ export const sendChatMessage = async (
     });
 
     if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "An error occurred");
+        const errorData = await response.json() as { message?: string };
+        throw new Error(errorData.message ?? "An error occurred");
     }
 
     const reader = response.body?.getReader();

@@ -1,12 +1,11 @@
 "use client";
 import { toast } from "@/hooks/use-toast";
-import { Message } from "@/store/mindMapStore";
+import type { Message } from "@/store/mindMapStore";
 import { Copy } from "lucide-react";
 import React from "react";
 import { Draggable } from "react-beautiful-dnd";
 import Markdown from "react-markdown";
 import remarkGfm from 'remark-gfm';
-
 
 interface ChatMessageProps {
   message: Message;
@@ -15,10 +14,18 @@ interface ChatMessageProps {
 
 export const ChatMessage: React.FC<ChatMessageProps> = ({ message, index }) => {
   const handleCopyMessage = () => {
-    navigator.clipboard.writeText(message.content);
-    toast({
-      description: "Message copied to clipboard!",
-      duration: 1000,
+    void navigator.clipboard.writeText(message.content).then(() => {
+      toast({
+        description: "Message copied to clipboard!",
+        duration: 1000,
+      });
+    }).catch((error) => {
+      console.error("Failed to copy message:", error);
+      toast({
+        description: "Failed to copy message",
+        variant: "destructive",
+        duration: 1000,
+      });
     });
   };
 

@@ -11,9 +11,6 @@ const Sidebar: React.FC = () => {
     <div className="w-64 pb-12">
       <div className="space-y-4 py-4">
         <div className="px-3 py-2">
-          <h2 className="mb-2 px-4 text-lg font-semibold tracking-tight">
-            Navigation
-          </h2>
           <div className="space-y-1">
             <Link href="/">
               <Button
@@ -51,9 +48,11 @@ const Sidebar: React.FC = () => {
                   strokeLinejoin="round"
                   className="mr-2 h-4 w-4"
                 >
-                  <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <path d="M12 16v-4"></path>
+                  <path d="M8 12h8"></path>
                 </svg>
-                MindMap
+                Mindmaps
               </Button>
             </Link>
             <Link href="/todo">

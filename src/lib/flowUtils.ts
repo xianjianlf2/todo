@@ -1,8 +1,6 @@
 import dagre from "@dagrejs/dagre";
-import {
-    Edge,
-    Node
-} from "@xyflow/react";
+import type { Edge, Node } from "@xyflow/react";
+import type { Content, Heading, List, ListItem, Paragraph, Root } from "mdast";
 import remarkParse from "remark-parse";
 import { unified } from "unified";
 
@@ -35,124 +33,116 @@ const getLayoutElements = (nodes: Node[], edges: Edge[]) => {
 };
 const parseMarkdownToFlowData = (markdown: string) => {
     const processor = unified().use(remarkParse);
-    const parsed = processor.parse(markdown);
+    const parsed = processor.parse(markdown) as Root;
     const nodes: Node[] = [];
     const edges: Edge[] = [];
 
     let nodeId = 1;
-    const headingStack: { id: string; depth: number }[] = []; // 用于保存标题节点的栈
+    const headingStack: { id: string; depth: number }[] = [];
 
-    function traverse(node: any, parentId: string | null = null) {
+    function traverse(node: Content, parentId: string | null = null) {
         if (node.type === "heading") {
-            const nodeLabel =
-                node.children.map((child: any) => child.value || "").join("") ||
-                "无标题";
+            const headingNode = node as Heading;
+            const nodeLabel = headingNode.children
+                .map((child) => ('value' in child ? child.value : ''))
+                .join('') || "Empty";
             const nodeIdStr = `node-${nodeId++}`;
-            const headingDepth = node.depth;
+            const headingDepth = headingNode.depth;
 
-            // 创建标题节点
             nodes.push({
                 id: nodeIdStr,
                 data: { label: nodeLabel },
                 position: { x: Math.random() * 500, y: Math.random() * 500 },
             });
 
-            // 处理栈：根据标题深度调整栈的层次
             while (
                 headingStack.length > 0 &&
                 headingStack[headingStack.length - 1]!.depth >= headingDepth
             ) {
-                headingStack.pop(); // 当前标题比栈顶的标题层级更高或相同，弹出栈顶
+                headingStack.pop();
             }
 
-            // 如果栈中有标题，说明这是该标题的子标题
             if (headingStack.length > 0) {
                 const parentHeading = headingStack[headingStack.length - 1];
-                if (!parentHeading) return;
-                edges.push({
-                    id: `edge-${nodeId}`,
-                    source: parentHeading.id,
-                    target: nodeIdStr,
-                    type: "smoothstep",
-                });
+                if (parentHeading) {
+                    edges.push({
+                        id: `edge-${nodeId}`,
+                        source: parentHeading.id,
+                        target: nodeIdStr,
+                        type: "smoothstep",
+                    });
+                }
             }
 
-            // 将当前标题压入栈中
             headingStack.push({ id: nodeIdStr, depth: headingDepth });
 
-            // 处理该标题下的子节点
-            node.children.forEach((child: any) => traverse(child, nodeIdStr));
+            headingNode.children.forEach((child) => traverse(child, nodeIdStr));
         } else if (node.type === "paragraph") {
-            // 如果是段落节点，将段落中的文本拼接成一个字符串
-            const textContent =
-                node.children.map((child: any) => child.value || "").join("") ||
-                "无内容";
+            const paragraphNode = node as Paragraph;
+            const textContent = paragraphNode.children
+                .map((child) => ('value' in child ? child.value : ''))
+                .join('') || "无内容";
             const nodeIdStr = `node-${nodeId++}`;
 
-            // 创建段落节点
             nodes.push({
                 id: nodeIdStr,
                 data: { label: textContent },
                 position: { x: Math.random() * 500, y: Math.random() * 500 },
             });
 
-            // 段落的父节点应该是当前栈顶的标题
             if (headingStack.length > 0) {
                 const parentHeading = headingStack[headingStack.length - 1];
-                if (!parentHeading) return;
-                edges.push({
-                    id: `edge-${nodeId}`,
-                    source: parentHeading.id,
-                    target: nodeIdStr,
-                    type: "smoothstep",
-                });
+                if (parentHeading) {
+                    edges.push({
+                        id: `edge-${nodeId}`,
+                        source: parentHeading.id,
+                        target: nodeIdStr,
+                        type: "smoothstep",
+                    });
+                }
             }
         } else if (node.type === "list") {
-            // 如果是列表节点，递归处理每个列表项
-            node.children.forEach((item: any) => traverse(item, parentId));
+            const listNode = node as List;
+            listNode.children.forEach((item) => traverse(item, parentId));
         } else if (node.type === "listItem") {
-            // 对于列表项，将其内容拼接成一个节点
-            const listItemContent =
-                node.children
-                    .map((child: any) => {
-                        if (child.type === "paragraph") {
-                            return child.children
-                                .map((grandchild: any) => grandchild.value || "")
-                                .join("");
-                        } else {
-                            return child.value || "";
-                        }
-                    })
-                    .join("") || "无内容";
+            const listItemNode = node as ListItem;
+            const listItemContent = listItemNode.children
+                .map((child) => {
+                    if (child.type === "paragraph") {
+                        return (child as Paragraph).children
+                            .map((grandchild) => ('value' in grandchild ? grandchild.value : ''))
+                            .join('');
+                    } else {
+                        return 'value' in child ? child.value : '';
+                    }
+                })
+                .join('') || "无内容";
 
             const nodeIdStr = `node-${nodeId++}`;
 
-            // 创建列表项节点
             nodes.push({
                 id: nodeIdStr,
                 data: { label: listItemContent },
                 position: { x: Math.random() * 500, y: Math.random() * 500 },
             });
 
-            // 列表项的父节点是当前栈顶的标题
             if (headingStack.length > 0) {
                 const parentHeading = headingStack[headingStack.length - 1];
-                if (!parentHeading) return;
-                edges.push({
-                    id: `edge-${nodeId}`,
-                    source: parentHeading.id,
-                    target: nodeIdStr,
-                    type: "smoothstep",
-                });
+                if (parentHeading) {
+                    edges.push({
+                        id: `edge-${nodeId}`,
+                        source: parentHeading.id,
+                        target: nodeIdStr,
+                        type: "smoothstep",
+                    });
+                }
             }
-        } else if (node.children) {
-            // 如果是其他类型的节点，递归处理其子节点
-            node.children.forEach((child: any) => traverse(child, parentId));
+        } else if ('children' in node) {
+            node.children.forEach((child) => traverse(child as Content, parentId));
         }
     }
 
-    // 开始遍历解析后的 Markdown AST
-    traverse(parsed);
+    parsed.children.forEach((child) => traverse(child));
 
     return getLayoutElements(nodes, edges);
 };

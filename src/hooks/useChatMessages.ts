@@ -1,7 +1,7 @@
 import { sendChatMessage } from "@/actions/chat";
 import { generateId } from "@/lib/utils";
 import { useChatStore } from "@/store/chatStore";
-import { Message } from "@/store/mindMapStore";
+import type { Message } from "@/store/mindMapStore";
 import { useCallback } from 'react';
 import { toast } from "./use-toast";
 
@@ -15,14 +15,14 @@ export const useChatMessages = () => {
         setIsStreaming(true);
 
         try {
-            let assistantMessage: Message = { id: generateId(), role: "assistant", content: "" };
+            const assistantMessage: Message = { id: generateId(), role: "assistant", content: "" };
             addMessage(assistantMessage);
 
             await sendChatMessage(
                 [...messages.slice(1), userMessage],
                 modelType,
-                (chunk) => {
-                    const data = JSON.parse(chunk);
+                (chunk: string) => {
+                    const data = JSON.parse(chunk) as { content: string };
                     appendAssistantMessage(data.content);
                 },
             );
@@ -36,7 +36,7 @@ export const useChatMessages = () => {
         } finally {
             setIsStreaming(false);
         }
-    }, [messages, addMessage, isStreaming, appendAssistantMessage]);
+    }, [messages, addMessage, isStreaming, appendAssistantMessage, setIsStreaming]);
 
     return { messages, isStreaming, sendMessage };
 };

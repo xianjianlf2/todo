@@ -1,26 +1,34 @@
-import { models, ModelType } from '@/lib/langchain';
-import { AIMessage, BaseMessageLike, HumanMessage } from '@langchain/core/messages';
+'use server'
+
+import type { ModelType } from '@/lib/langchain';
+import { models } from '@/lib/langchain';
+import type { Message } from '@/store/chatStore';
+import type { BaseMessageLike } from '@langchain/core/messages';
+import { AIMessage, HumanMessage } from '@langchain/core/messages';
 import { NextResponse } from 'next/server';
 
-function processHistoryMessages(messages: any[]): BaseMessageLike[] {
+function processHistoryMessages(messages: Message[]): BaseMessageLike[] {
   return messages.map(msg => {
-    if (msg.role === 'user') {
-      return new HumanMessage(msg.content);
-    } else if (msg.role === 'assistant') {
-      return new AIMessage(msg.content);
+    switch (msg.role) {
+      case 'user':
+        return new HumanMessage(msg.content);
+      case 'assistant':
+        return new AIMessage(msg.content);
+      default:
+        throw new Error(`Unknown message role: ${msg.role as string}`);
     }
-    return msg;
   });
 }
+
 export async function POST(request: Request) {
-  const { messages, modelType } = await request.json();
+  const { messages, modelType } = await request.json() as { messages: Message[]; modelType: string };
   const apiKey = request.headers.get('Authorization')?.split('Bearer ')[1];
 
   if (!messages || !modelType) {
     return NextResponse.json({ message: 'Missing messages or modelType' }, { status: 400 });
   }
 
-  const key = apiKey || process.env.OPENAI_API_KEY;
+  const key = apiKey ?? process.env.OPENAI_API_KEY;
   if (!key) {
     return NextResponse.json({ message: 'API key is required but not provided' }, { status: 401 });
   }

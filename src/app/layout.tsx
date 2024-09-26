@@ -1,5 +1,4 @@
-import Header from "@/components/Header";
-import Sidebar from "@/components/Sidebar";
+import LayoutWrapper from "@/components/LayoutWrapper";
 import ThemeProvider from "@/components/ThemeProvider";
 import { Toaster } from "@/components/ui/toaster";
 import zhCNlocales from "@/locales/zh.json";
@@ -8,6 +7,7 @@ import { zhCN } from "@clerk/localizations";
 import { ClerkProvider } from "@clerk/nextjs";
 import merge from "lodash.merge";
 import { type Metadata } from "next";
+import { dark } from "@clerk/themes";
 
 export const metadata: Metadata = {
   title: "Create T3 App",
@@ -19,20 +19,24 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   const localization = merge(zhCN, zhCNlocales);
+  const clerkAppearance = {
+    baseTheme: [dark],
+  };
+
   return (
-    <ClerkProvider localization={localization}>
+    <ClerkProvider localization={localization} appearance={clerkAppearance}>
       <html lang="zh-CN" suppressHydrationWarning className="h-full">
-        <body className="flex h-full flex-col">
+        <body className="h-full">
           <ThemeProvider
             attribute="class"
             defaultTheme="system"
             enableSystem
             disableTransitionOnChange
           >
-            <Header />
-            <div className="flex flex-1 overflow-hidden">
-              <Sidebar />
-              <main className="flex-1">{children}</main>
+            <div className="flex h-full flex-col">
+              <LayoutWrapper>
+                {children}
+              </LayoutWrapper>
             </div>
             <Toaster />
           </ThemeProvider>

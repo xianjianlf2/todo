@@ -1,16 +1,26 @@
 import { useEffect, useState } from "react";
-import { Droppable, DroppableProps } from "react-beautiful-dnd";
+import type { DroppableProps, DroppableProvided, DroppableStateSnapshot } from "react-beautiful-dnd";
+import { Droppable } from "react-beautiful-dnd";
+
 export const StrictModeDroppable = ({ children, ...props }: DroppableProps) => {
   const [enabled, setEnabled] = useState(false);
+
   useEffect(() => {
     const animation = requestAnimationFrame(() => setEnabled(true));
+
     return () => {
       cancelAnimationFrame(animation);
       setEnabled(false);
     };
   }, []);
+
   if (!enabled) {
     return null;
   }
-  return <Droppable {...props}>{children}</Droppable>;
+
+  return (
+    <Droppable {...props}>
+      {(provided: DroppableProvided, snapshot: DroppableStateSnapshot) => children(provided, snapshot)}
+    </Droppable>
+  );
 };

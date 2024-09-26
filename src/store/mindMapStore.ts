@@ -1,4 +1,5 @@
-import { Edge, Node, NodeChange, applyNodeChanges } from "@xyflow/react";
+import type { Edge, Node, NodeChange } from "@xyflow/react";
+import { applyNodeChanges } from "@xyflow/react";
 import { create } from "zustand";
 
 export interface Message {
