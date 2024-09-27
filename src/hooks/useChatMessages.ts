@@ -8,7 +8,7 @@ import { toast } from "./use-toast";
 export const useChatMessages = () => {
     const { messages, isStreaming, addMessage, setIsStreaming, appendAssistantMessage } = useChatStore();
 
-    const sendMessage = useCallback(async (content: string, modelType: string) => {
+    const sendMessage = useCallback(async (content: string, modelType: string, apiKey: string) => {
         if (isStreaming) return;
         const userMessage: Message = { id: generateId(), role: "user", content };
         addMessage(userMessage);
@@ -21,6 +21,7 @@ export const useChatMessages = () => {
             await sendChatMessage(
                 [...messages.slice(1), userMessage],
                 modelType,
+                apiKey,
                 (chunk: string) => {
                     const data = JSON.parse(chunk) as { content: string };
                     appendAssistantMessage(data.content);

@@ -1,16 +1,18 @@
 'use client'
 import type { Message } from "@/store/mindMapStore";
 
-
 export const sendChatMessage = async (
     messages: Message[],
     modelType: string,
+    apiKey: string,
     onChunk: (chunk: string) => void
 ) => {
-
     const response = await fetch("/api/chat", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${apiKey}`
+        },
         body: JSON.stringify({ messages, modelType }),
     });
 

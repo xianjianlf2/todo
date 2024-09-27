@@ -47,14 +47,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: 'Missing messages or modelType' }, { status: 400 });
   }
 
-  const key = apiKey ?? process.env.OPENAI_API_KEY;
-  if (!key) {
-    return NextResponse.json({ message: 'API key is required but not provided' }, { status: 401 });
+  if (!apiKey) {
+    return NextResponse.json({ message: 'API key is required' }, { status: 401 });
   }
 
   try {
     const model = models[modelType as ModelType];
-    model.apiKey = key;
+    model.apiKey = apiKey;
     const processedMessages = processHistoryMessages(messages);
 
     const lastUserMessage = messages[messages.length - 1];

@@ -12,7 +12,7 @@ import {
 import { Spinner } from "../ui/spinner";
 
 interface ChatInputProps {
-  onSendMessage: (content: string, modelType: string) => void;
+  onSendMessage: (content: string, modelType: string, apiKey: string) => void;
   isStreaming: boolean;
 }
 
@@ -22,16 +22,23 @@ export const ChatInput: React.FC<ChatInputProps> = ({
 }) => {
   const [inputMessage, setInputMessage] = useState("");
   const [modelType, setModelType] = useState("gpt-3.5-turbo");
+  const [apiKey, setApiKey] = useState("");
 
   const handleSendMessage = () => {
-    if (inputMessage.trim()) {
-      onSendMessage(inputMessage, modelType);
+    if (inputMessage.trim() && apiKey.trim()) {
+      onSendMessage(inputMessage, modelType, apiKey);
       setInputMessage("");
     }
   };
 
   return (
     <div className="space-y-2">
+      <Input
+        placeholder="Enter your OpenAI API key"
+        value={apiKey}
+        onChange={(e) => setApiKey(e.target.value)}
+        type="password"
+      />
       <Input
         placeholder="Type your message..."
         value={inputMessage}
@@ -51,7 +58,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
             ))}
           </SelectContent>
         </Select>
-        <Button onClick={handleSendMessage} disabled={isStreaming}>
+        <Button onClick={handleSendMessage} disabled={isStreaming || !apiKey.trim()}>
           {isStreaming ? <Spinner className="mr-2 h-4 w-4" /> : null}
           Send
         </Button>
