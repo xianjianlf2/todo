@@ -5,8 +5,8 @@ import { useChatMessages } from "@/hooks/useChatMessages";
 import { useSidebarResize } from "@/hooks/useSidebarResize";
 import { useChatStore } from "@/store/chatStore";
 import { Trash2 } from "lucide-react";
-import React, { useEffect, useRef } from "react";
-import { StrictModeDroppable } from "../StrictModeDroppable";
+import React, { useEffect, useRef, useState } from "react";
+import { Droppable } from "react-beautiful-dnd";
 import { ChatInput } from "./ChatInput";
 import { ChatMessage } from "./ChatMessage";
 
@@ -19,6 +19,11 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({ isSidebarOpen }) => {
   const { sendMessage } = useChatMessages();
   const { sidebarWidth, handleMouseDown } = useSidebarResize();
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -47,20 +52,26 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({ isSidebarOpen }) => {
         </Button>
       </div>
       <ScrollArea className="mb-4 flex-grow space-y-4">
-        <StrictModeDroppable droppableId="droppable">
-          {(provided) => (
-            <div
-              ref={provided.innerRef}
-              {...provided.droppableProps}
-              className="space-y-4"
-            >
-              {messages.map((message, index) => (
-                <ChatMessage key={message.id} message={message} index={index} />
-              ))}
-              {provided.placeholder}
-            </div>
-          )}
-        </StrictModeDroppable>
+        {isMounted && (
+          <Droppable droppableId="droppable">
+            {(provided) => (
+              <div
+                ref={provided.innerRef}
+                {...provided.droppableProps}
+                className="space-y-4"
+              >
+                {messages.map((message, index) => (
+                  <ChatMessage
+                    key={message.id}
+                    message={message}
+                    index={index}
+                  />
+                ))}
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
+        )}
         <div ref={messagesEndRef} />
       </ScrollArea>
       <ChatInput onSendMessage={sendMessage} isStreaming={isStreaming} />

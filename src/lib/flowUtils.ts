@@ -1,6 +1,6 @@
 import dagre from "@dagrejs/dagre";
 import type { Edge, Node } from "@xyflow/react";
-import type { Content, Heading, List, ListItem, Paragraph, Root } from "mdast";
+import type { Content } from "mdast";
 import remarkParse from "remark-parse";
 import { unified } from "unified";
 
@@ -31,16 +31,17 @@ const getLayoutElements = (nodes: Node[], edges: Edge[]) => {
     });
     return { nodes, edges };
 };
+
 const parseMarkdownToFlowData = (markdown: string) => {
     const processor = unified().use(remarkParse);
-    const parsed = processor.parse(markdown) as Root;
+    const parsed = processor.parse(markdown);
     const nodes: Node[] = [];
     const edges: Edge[] = [];
 
     let nodeId = 1;
     const nodeStack: { id: string; depth: number }[] = [];
 
-    function traverse(node: Content, depth: number = 0) {
+    function traverse(node: Content, depth = 0) {
         if (node.type === "heading" || node.type === "listItem") {
             const nodeLabel = getNodeLabel(node);
             const nodeIdStr = `node-${nodeId++}`;
@@ -48,7 +49,7 @@ const parseMarkdownToFlowData = (markdown: string) => {
             nodes.push({
                 id: nodeIdStr,
                 data: { label: nodeLabel },
-                position: { x: 0, y: 0 }, 
+                position: { x: 0, y: 0 },
             });
 
             while (nodeStack.length > 0 && nodeStack[nodeStack.length - 1]!.depth >= depth) {
@@ -70,26 +71,26 @@ const parseMarkdownToFlowData = (markdown: string) => {
             nodeStack.push({ id: nodeIdStr, depth });
 
             if ('children' in node) {
-                node.children.forEach((child) => traverse(child as Content, depth + 1));
+                node.children.forEach((child) => traverse(child, depth + 1));
             }
         } else if (node.type === "list") {
-            const listNode = node as List;
+            const listNode = node;
             listNode.children.forEach((item) => traverse(item, depth));
         } else if ('children' in node) {
-            node.children.forEach((child) => traverse(child as Content, depth));
+            node.children.forEach((child) => traverse(child, depth));
         }
     }
 
     function getNodeLabel(node: Content): string {
         if (node.type === "heading") {
-            return (node as Heading).children
+            return node.children
                 .map((child) => ('value' in child ? child.value : ''))
                 .join('') || "Empty";
         } else if (node.type === "listItem") {
-            return (node as ListItem).children
+            return node.children
                 .map((child) => {
                     if (child.type === "paragraph") {
-                        return (child as Paragraph).children
+                        return child.children
                             .map((grandchild) => ('value' in grandchild ? grandchild.value : ''))
                             .join('');
                     } else {

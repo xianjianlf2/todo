@@ -1,3 +1,4 @@
+import Metrics from "@/app/metrics";
 import Footer from "@/components/Footer";
 import LayoutWrapper from "@/components/LayoutWrapper";
 import ThemeProvider from "@/components/ThemeProvider";
@@ -41,6 +42,7 @@ export default function RootLayout({
             </div>
             <Toaster />
           </ThemeProvider>
+          <Metrics />
         </body>
       </html>
     </ClerkProvider>

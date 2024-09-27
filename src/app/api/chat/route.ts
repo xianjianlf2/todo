@@ -55,7 +55,7 @@ export async function POST(request: Request) {
   try {
     const model = models[modelType as ModelType];
     model.apiKey = key;
-    let processedMessages = processHistoryMessages(messages);
+    const processedMessages = processHistoryMessages(messages);
 
     const lastUserMessage = messages[messages.length - 1];
     if (lastUserMessage && lastUserMessage.role === 'user' && needsMindMap(lastUserMessage.content)) {

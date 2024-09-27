@@ -16,7 +16,7 @@ export default function LandingPage() {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
-  const { isSignedIn, user } = useUser();
+  const { isSignedIn } = useUser();
 
   useEffect(() => {
     setMounted(true);
@@ -74,24 +74,33 @@ export default function LandingPage() {
           </header>
 
           <main className="mt-16 pb-16">
-            <section className="text-center py-16 bg-gradient-to-b from-background to-secondary/20">
-              <h2 className="mb-6 text-5xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">
+            <section className="bg-gradient-to-b from-background to-secondary/20 py-16 text-center">
+              <h2 className="mb-6 bg-gradient-to-r from-primary to-secondary bg-clip-text text-5xl font-extrabold text-transparent">
                 AI-Powered Mind Mapping
               </h2>
-              <p className="mb-10 text-xl text-muted-foreground max-w-2xl mx-auto">
+              <p className="mx-auto mb-10 max-w-2xl text-xl text-muted-foreground">
                 Create beautiful mind maps through natural conversations with
                 AI. Organize your ideas and boost productivity effortlessly.
               </p>
               <div className="mb-12 flex justify-center space-x-4">
-                <Button asChild size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-300">
+                <Button
+                  asChild
+                  size="lg"
+                  className="bg-primary text-primary-foreground shadow-lg transition-all duration-300 hover:bg-primary/90 hover:shadow-xl"
+                >
                   <Link href="/mindmap/new">Get Started for Free</Link>
                 </Button>
-                <Button asChild size="lg" variant="outline" className="border-primary text-primary hover:bg-primary/10 shadow-lg hover:shadow-xl transition-all duration-300">
+                <Button
+                  asChild
+                  size="lg"
+                  variant="outline"
+                  className="border-primary text-primary shadow-lg transition-all duration-300 hover:bg-primary/10 hover:shadow-xl"
+                >
                   <Link href="/demo">Watch Demo</Link>
                 </Button>
               </div>
-              <div className="relative aspect-video w-full max-w-4xl mx-auto rounded-2xl overflow-hidden shadow-2xl bg-gradient-to-br from-primary/10 to-secondary/10 dark:from-primary/5 dark:to-secondary/5 p-2">
-                <div className="relative w-full h-full rounded-xl overflow-hidden bg-background/50 dark:bg-background/20">
+              <div className="relative mx-auto aspect-video w-full max-w-4xl overflow-hidden rounded-2xl bg-gradient-to-br from-primary/10 to-secondary/10 p-2 shadow-2xl dark:from-primary/5 dark:to-secondary/5">
+                <div className="relative h-full w-full overflow-hidden rounded-xl bg-background/50 dark:bg-background/20">
                   <Image
                     src="/snapshot.gif"
                     alt="AI-Generated Mind Map Example"

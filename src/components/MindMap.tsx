@@ -25,7 +25,8 @@ import {
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useCallback, useEffect, useState } from "react";
-import { DragDropContext, DropResult } from "react-beautiful-dnd";
+import type { DropResult } from "react-beautiful-dnd";
+import { DragDropContext } from "react-beautiful-dnd";
 
 const MindMapContent = ({
   mindMap,
@@ -83,7 +84,7 @@ const MindMapContent = ({
       setTimeout(() => setHighlightedNodes([]), 2000);
 
       setTimeout(() => {
-        reactFlowInstance.fitView({ padding: 0.1 });
+        void reactFlowInstance.fitView({ padding: 0.1 });
       }, 50);
     },
     [messages, setNodes, setEdges, setHighlightedNodes, reactFlowInstance],
