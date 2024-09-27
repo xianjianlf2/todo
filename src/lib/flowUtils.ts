@@ -38,75 +38,55 @@ const parseMarkdownToFlowData = (markdown: string) => {
     const edges: Edge[] = [];
 
     let nodeId = 1;
-    const headingStack: { id: string; depth: number }[] = [];
+    const nodeStack: { id: string; depth: number }[] = [];
 
-    function traverse(node: Content, parentId: string | null = null) {
-        if (node.type === "heading") {
-            const headingNode = node as Heading;
-            const nodeLabel = headingNode.children
-                .map((child) => ('value' in child ? child.value : ''))
-                .join('') || "Empty";
+    function traverse(node: Content, depth: number = 0) {
+        if (node.type === "heading" || node.type === "listItem") {
+            const nodeLabel = getNodeLabel(node);
             const nodeIdStr = `node-${nodeId++}`;
-            const headingDepth = headingNode.depth;
 
             nodes.push({
                 id: nodeIdStr,
                 data: { label: nodeLabel },
-                position: { x: Math.random() * 500, y: Math.random() * 500 },
+                position: { x: 0, y: 0 }, 
             });
 
-            while (
-                headingStack.length > 0 &&
-                headingStack[headingStack.length - 1]!.depth >= headingDepth
-            ) {
-                headingStack.pop();
+            while (nodeStack.length > 0 && nodeStack[nodeStack.length - 1]!.depth >= depth) {
+                nodeStack.pop();
             }
 
-            if (headingStack.length > 0) {
-                const parentHeading = headingStack[headingStack.length - 1];
-                if (parentHeading) {
+            if (nodeStack.length > 0) {
+                const parentNode = nodeStack[nodeStack.length - 1];
+                if (parentNode) {
                     edges.push({
                         id: `edge-${nodeId}`,
-                        source: parentHeading.id,
+                        source: parentNode.id,
                         target: nodeIdStr,
                         type: "smoothstep",
                     });
                 }
             }
 
-            headingStack.push({ id: nodeIdStr, depth: headingDepth });
+            nodeStack.push({ id: nodeIdStr, depth });
 
-            headingNode.children.forEach((child) => traverse(child, nodeIdStr));
-        } else if (node.type === "paragraph") {
-            const paragraphNode = node as Paragraph;
-            const textContent = paragraphNode.children
-                .map((child) => ('value' in child ? child.value : ''))
-                .join('') || "无内容";
-            const nodeIdStr = `node-${nodeId++}`;
-
-            nodes.push({
-                id: nodeIdStr,
-                data: { label: textContent },
-                position: { x: Math.random() * 500, y: Math.random() * 500 },
-            });
-
-            if (headingStack.length > 0) {
-                const parentHeading = headingStack[headingStack.length - 1];
-                if (parentHeading) {
-                    edges.push({
-                        id: `edge-${nodeId}`,
-                        source: parentHeading.id,
-                        target: nodeIdStr,
-                        type: "smoothstep",
-                    });
-                }
+            if ('children' in node) {
+                node.children.forEach((child) => traverse(child as Content, depth + 1));
             }
         } else if (node.type === "list") {
             const listNode = node as List;
-            listNode.children.forEach((item) => traverse(item, parentId));
+            listNode.children.forEach((item) => traverse(item, depth));
+        } else if ('children' in node) {
+            node.children.forEach((child) => traverse(child as Content, depth));
+        }
+    }
+
+    function getNodeLabel(node: Content): string {
+        if (node.type === "heading") {
+            return (node as Heading).children
+                .map((child) => ('value' in child ? child.value : ''))
+                .join('') || "Empty";
         } else if (node.type === "listItem") {
-            const listItemNode = node as ListItem;
-            const listItemContent = listItemNode.children
+            return (node as ListItem).children
                 .map((child) => {
                     if (child.type === "paragraph") {
                         return (child as Paragraph).children
@@ -116,30 +96,9 @@ const parseMarkdownToFlowData = (markdown: string) => {
                         return 'value' in child ? child.value : '';
                     }
                 })
-                .join('') || "无内容";
-
-            const nodeIdStr = `node-${nodeId++}`;
-
-            nodes.push({
-                id: nodeIdStr,
-                data: { label: listItemContent },
-                position: { x: Math.random() * 500, y: Math.random() * 500 },
-            });
-
-            if (headingStack.length > 0) {
-                const parentHeading = headingStack[headingStack.length - 1];
-                if (parentHeading) {
-                    edges.push({
-                        id: `edge-${nodeId}`,
-                        source: parentHeading.id,
-                        target: nodeIdStr,
-                        type: "smoothstep",
-                    });
-                }
-            }
-        } else if ('children' in node) {
-            node.children.forEach((child) => traverse(child as Content, parentId));
+                .join('') || "Empty";
         }
+        return "Empty";
     }
 
     parsed.children.forEach((child) => traverse(child));

@@ -57,6 +57,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message, index }) => {
             </div>
             <hr className="mb-2 border-t border-gray-300 dark:border-gray-600" />
             <Markdown remarkPlugins={[remarkGfm]}>{message.content}</Markdown>
+            
           </div>
         </div>
       )}

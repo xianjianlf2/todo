@@ -4,7 +4,7 @@ import type { ModelType } from '@/lib/langchain';
 import { models } from '@/lib/langchain';
 import type { Message } from '@/store/chatStore';
 import type { BaseMessageLike } from '@langchain/core/messages';
-import { AIMessage, HumanMessage } from '@langchain/core/messages';
+import { AIMessage, HumanMessage, SystemMessage } from '@langchain/core/messages';
 import { NextResponse } from 'next/server';
 
 function processHistoryMessages(messages: Message[]): BaseMessageLike[] {
@@ -18,6 +18,25 @@ function processHistoryMessages(messages: Message[]): BaseMessageLike[] {
         throw new Error(`Unknown message role: ${msg.role as string}`);
     }
   });
+}
+
+function needsMindMap(content: string): boolean {
+  const keywords = ["思维导图", "脑图", "概念图", "mind map", "road map", "guide line", "mindmap", "roadmap"];
+  return keywords.some(keyword => content.toLowerCase().includes(keyword));
+}
+
+function createMindMapPrompt(content: string): string {
+  return `Create a concise mind map for the following topic: ${content}
+
+Requirements:
+1. Use markdown format
+2. Prefer short, concise language
+3. Structure the mind map with 3 levels:
+   - Main topic
+   - Key concepts (usually 3-5)
+   - Important details for each concept
+
+Please describe the structure of the mind map using markdown headings and bullet points.`;
 }
 
 export async function POST(request: Request) {
@@ -36,7 +55,14 @@ export async function POST(request: Request) {
   try {
     const model = models[modelType as ModelType];
     model.apiKey = key;
-    const processedMessages = processHistoryMessages(messages);
+    let processedMessages = processHistoryMessages(messages);
+
+    const lastUserMessage = messages[messages.length - 1];
+    if (lastUserMessage && lastUserMessage.role === 'user' && needsMindMap(lastUserMessage.content)) {
+      const mindMapPrompt = createMindMapPrompt(lastUserMessage.content);
+      processedMessages.push(new SystemMessage(mindMapPrompt));
+    }
+
     const stream = await model.stream(processedMessages);
     const encoder = new TextEncoder();
 

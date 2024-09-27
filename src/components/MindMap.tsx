@@ -12,6 +12,8 @@ import {
   BackgroundVariant,
   Controls,
   ReactFlow,
+  ReactFlowProvider,
+  useReactFlow,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import {
@@ -25,7 +27,7 @@ import { useTheme } from "next-themes";
 import { useCallback, useEffect, useState } from "react";
 import { DragDropContext, DropResult } from "react-beautiful-dnd";
 
-const MindMap = ({
+const MindMapContent = ({
   mindMap,
   onSave,
   onDelete,
@@ -36,7 +38,9 @@ const MindMap = ({
 }) => {
   const { theme } = useTheme();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [colorMode, setColorMode] = useState<"light" | "dark">("light");
+  const [colorMode, setColorMode] = useState<"light" | "dark">(() =>
+    theme === "light" ? "light" : "dark",
+  );
   const {
     nodes,
     edges,
@@ -56,10 +60,11 @@ const MindMap = ({
   useEffect(() => {
     setColorMode(theme === "dark" ? "dark" : "light");
   }, [theme]);
+  const reactFlowInstance = useReactFlow();
 
   const onDragEnd = useCallback(
     (result: DropResult) => {
-      if (!result?.draggableId || !result.destination) return;
+      if (!result?.draggableId) return;
 
       const message = messages.find(
         (message) => message.id === result.draggableId,
@@ -76,13 +81,21 @@ const MindMap = ({
       const newNodeIds = newNodes.map((node) => node.id);
       setHighlightedNodes(newNodeIds);
       setTimeout(() => setHighlightedNodes([]), 2000);
+
+      setTimeout(() => {
+        reactFlowInstance.fitView({ padding: 0.1 });
+      }, 50);
     },
-    [messages, setNodes, setEdges, setHighlightedNodes],
+    [messages, setNodes, setEdges, setHighlightedNodes, reactFlowInstance],
   );
 
   useEffect(() => {
     if (mindMap.data) {
-      const { nodes: newNodes, edges: newEdges, messages: newMessages } = mindMap.data;
+      const {
+        nodes: newNodes,
+        edges: newEdges,
+        messages: newMessages,
+      } = mindMap.data;
       setNodes(newNodes);
       setEdges(newEdges);
       setMessages(newMessages);
@@ -143,6 +156,18 @@ const MindMap = ({
         {isSidebarOpen && <ChatSidebar isSidebarOpen={isSidebarOpen} />}
       </DragDropContext>
     </Card>
+  );
+};
+
+const MindMap = (props: {
+  mindMap: MindMapType;
+  onSave: (mindMap: MindMapType) => void;
+  onDelete: () => void;
+}) => {
+  return (
+    <ReactFlowProvider>
+      <MindMapContent {...props} />
+    </ReactFlowProvider>
   );
 };
 
