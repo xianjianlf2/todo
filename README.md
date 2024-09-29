@@ -23,3 +23,7 @@
 ---
 2024-9-27
 - export to image
+---
+2024-9-28
+- auto fetch model list
+- custom key and base url

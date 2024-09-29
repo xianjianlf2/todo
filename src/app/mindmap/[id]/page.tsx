@@ -18,6 +18,7 @@ import type { MindMap } from "@/types/mindmap";
 import { ArrowLeft, Check, Pencil, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
+
 export default function MindMapPage({ params }: { params: { id: string } }) {
   const router = useRouter();
   const [mindMap, setMindMap] = useState<MindMap | null>(null);
@@ -170,7 +171,12 @@ export default function MindMapPage({ params }: { params: { id: string } }) {
   return (
     <div className="mx-auto box-border h-full w-full p-4">
       <div className="mb-4 flex items-center">
-        <Button variant="ghost" size="icon" onClick={handleGoBack} className="mr-2">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={handleGoBack}
+          className="mr-2"
+        >
           <ArrowLeft className="h-4 w-4" />
         </Button>
         {isEditing ? (
